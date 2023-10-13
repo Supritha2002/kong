@@ -1,0 +1,151 @@
+_format_version: "1.1"
+_transform: true
+
+services:
+  - host: azurevault_operations
+    name: azurevault_operations
+    port: 80
+    protocol: http
+    routes:
+      - name: redirect_path
+        paths:
+          - /azureops
+        methods:
+          - GET
+          - POST
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              uri_param_names:
+                - jwt
+              claims_to_verify:
+                - "exp"
+              key_claim_name: "iss"
+              secret_is_base64: false
+              header_names:
+                - "authorization"
+
+      - name: getHostDetails
+        paths:
+          - /gethost/hostdetails
+        strip_path: false
+        methods:
+          - GET
+        plugins:
+          - name: jwt
+            config:
+              uri_param_names:
+                - jwt
+              claims_to_verify:
+                - "exp"
+              key_claim_name: "iss"
+              secret_is_base64: false
+              header_names:
+                - "authorization"
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "/gethost/hostdetails"
+              replace:
+                headers:
+                  - "/get/hostdetails"
+
+      - name: uploadSecret
+        paths:
+          - /upload/Secret
+        strip_path: false
+        methods:
+          - POST
+        plugins:
+          - name: jwt
+            config:
+              uri_param_names:
+                - jwt
+              claims_to_verify:
+                - "exp"
+              key_claim_name: "iss"
+              secret_is_base64: false
+              header_names:
+                - "authorization"
+
+      - name: getSecretValue
+        paths:
+          - /get/SecretValue
+        strip_path: false
+        methods:
+          - GET
+        plugins:
+          - name: jwt
+            config:
+              uri_param_names:
+                - jwt
+              claims_to_verify:
+                - "exp"
+              key_claim_name: "iss"
+              secret_is_base64: false
+              header_names:
+                - "authorization"
+
+      - name: getSecretNames
+        paths:
+          - /get/SecretNames
+        strip_path: false
+        methods:
+          - GET
+        plugins:
+          - name: jwt
+            config:
+              uri_param_names:
+                - jwt
+              claims_to_verify:
+                - "exp"
+              key_claim_name: "iss"
+              secret_is_base64: false
+              header_names:
+                - "authorization"
+
+  - host: numo_auto_payout
+    name: auto-payout
+    port: 3000
+    protocol: http
+    routes:
+      - name: autopayout
+        host: numoops.numocity.in
+        paths:
+          - /autopayout
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              uri_param_names:
+                - jwt
+              claims_to_verify:
+                - "exp"
+              key_claim_name: "iss"
+              secret_is_base64: false
+              header_names:
+                - "authorization"
+
+  - host: numo_hub_authenticator
+    name: numo-hub-authenticator
+    port: 4000
+    protocol: http
+    routes:
+      - name: numo-hub-authenticator
+        host: numoops.numocity.in
+        paths:
+          - /usermanager
+        strip_path: true
+
+  - host: commerce_web_admin
+    name: web-admin-app
+    port: 3000
+    protocol: http
+    routes:
+      - name: web-admin-route
+        host: numoops.numocity.in
+        paths:
+          - /mock
+        strip_path: true
